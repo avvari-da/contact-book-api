@@ -4,7 +4,7 @@ class ContactsController < ApplicationController
 
   # GET /users/:user_id/contacts
   def index
-    json_response(@user.contacts)
+    json_response({ contacts: @user.contacts })
   end
 
   # GET /users/:user_id/contacts/:id
@@ -38,6 +38,9 @@ class ContactsController < ApplicationController
 
   def set_user
     @user = User.find(params[:user_id])
+    if !request.headers["Authorization"].present? || request.headers["Authorization"] != "Token " + @user.get_user_latest_active_access_token
+      json_response({message: 'Unauthorized'}, :unauthorized)
+    end
   end
 
   def set_user_contact

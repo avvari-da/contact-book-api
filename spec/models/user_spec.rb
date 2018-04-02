@@ -2,9 +2,13 @@ require 'rails_helper'
 
 RSpec.describe User, type: :model do
   # Association test
-  # ensure Contact model has a 1:1 relationship with the User model
+  # ensure User model has a 1:m relationship with the Contact model
   it do
     should have_many(:contacts).dependent(:destroy)
+  end
+  # ensure User model has a 1:m relationship with the UserToken model
+  it do
+    should have_many(:user_tokens).dependent(:destroy)
   end
 
   # Validation test
@@ -14,6 +18,7 @@ RSpec.describe User, type: :model do
   end
   it do
     should validate_presence_of(:email)
+    should validate_uniqueness_of(:email)
   end
   it do
     should validate_presence_of(:password)

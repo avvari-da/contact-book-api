@@ -78,4 +78,42 @@ RSpec.describe 'Users API', type: :request do
       end
     end
   end
+
+  # Test suite for POST /users/login
+  describe 'POST /users/login' do
+    # valid payload
+    let(:valid_attributes) do
+      {email: 'user@test.com', password: 'test123'}
+    end
+
+    context 'when the request is valid' do
+      before do
+        post '/users', params: valid_attributes
+      end
+
+      it 'returns a user id & token' do
+        expect(json['id']).not_to be_empty
+        expect(json['access_token']).not_to be_empty
+      end
+
+      it 'returns status code 200' do
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'when the request is invalid' do
+      before do
+        post '/users/login', params: valid_attributes
+      end
+
+      it 'returns status code 422' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns a validation failure message' do
+        expect(response.body)
+            .to match(/Validation failed: Password can't be blank/)
+      end
+    end
+  end
 end
