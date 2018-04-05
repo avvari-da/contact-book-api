@@ -4,7 +4,14 @@ class ContactsController < ApplicationController
 
   # GET /users/:user_id/contacts
   def index
-    json_response({ contacts: @user.contacts })
+    contact_search_data = contact_search_params
+    if contact_search_data[:q].present?
+      query = '%' + contact_search_data[:q] + '%'
+      contacts = @user.contacts.where('contacts.email LIKE ? OR contacts.firstname LIKE ? OR contacts.lastname LIKE ?', query, query, query)
+    else
+      contacts = @user.contacts
+    end
+    json_response({ contacts: contacts })
   end
 
   # GET /users/:user_id/contacts/:id
@@ -44,6 +51,10 @@ class ContactsController < ApplicationController
 
   def contact_params
     params.permit(:id, :firstname, :lastname, :email, :user_id)
+  end
+
+  def contact_search_params
+    params.permit(:q, :user_id)
   end
 
   def set_user
