@@ -11,15 +11,21 @@ class UsersController < ApplicationController
   # POST /users
   def create
     user_data = user_params
-    user_data[:password] = Digest::MD5.hexdigest(user_data[:password]) unless user_data[:password].nil?
-    @user = User.create!(user_data)
-    json_response(
-      {
-        id: @user.id,
-        access_token: UserToken.create!(user: @user).access_token
-      },
-      :created
-    )
+    if User.where(email: user_data[:email]).count == 0
+      user_data[:password] = Digest::MD5.hexdigest(user_data[:password]) unless user_data[:password].nil?
+      @user = User.create(user_data)
+      json_response(
+        {
+          id: @user.id,
+          name: @user.name,
+          email: @user.email,
+          token: UserToken.create!(user: @user).access_token
+        },
+        :created
+      )
+    else
+      json_response({message: 'User already exists'}, :conflict)
+    end
   end
 
   # GET /users/:id
@@ -32,18 +38,6 @@ class UsersController < ApplicationController
         last_login: UserToken.where(user: @user, active: true).try(:last).created_at
       }
     )
-  end
-
-  # PUT /users/:id
-  def update
-    @user.update(user_params)
-    head :no_content
-  end
-
-  # DELETE /users/:id
-  def destroy
-    @user.destroy
-    head :no_content
   end
 
   # LOGIN /users/login
@@ -70,7 +64,9 @@ class UsersController < ApplicationController
       json_response(
         {
           id: @user.id,
-          access_token: UserToken.create!(user: @user).access_token
+          name: @user.name,
+          email: @user.email,
+          token: UserToken.create!(user: @user).access_token
         },
         :created
       )

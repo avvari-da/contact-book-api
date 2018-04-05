@@ -93,7 +93,7 @@ RSpec.describe 'Users API', type: :request do
 
       it 'returns a user id & token' do
         expect(json['id']).not_to be_empty
-        expect(json['access_token']).not_to be_empty
+        expect(json['token']).not_to be_empty
       end
 
       it 'returns status code 200' do

@@ -14,14 +14,24 @@ class ContactsController < ApplicationController
 
   # POST /users/:user_id/contacts
   def create
-    @contact = @user.contacts.create!(contact_params)
-    json_response(@contact, :created)
+    contact_data = contact_params
+    if @user.contacts.where(email: contact_data[:email]).count == 0
+      @contact = @user.contacts.create(contact_data)
+      json_response(@contact, :created)
+    else
+      json_response({message: 'Contact already exists'}, :conflict)
+    end
   end
 
   # PUT /users/:user_id/contacts/:id
   def update
-    @contact.update(contact_params)
-    head :no_content
+    contact_data = contact_params
+    if @user.contacts.where(email: contact_data[:email]).where("contacts.id != ?", contact_data[:id]).count == 0
+      @contact.update(contact_data)
+      head :no_content
+    else
+      json_response({message: 'Contact already exists'}, :conflict)
+    end
   end
 
   # DELETE /users/:user_id/contacts/:id
@@ -33,7 +43,7 @@ class ContactsController < ApplicationController
   private
 
   def contact_params
-    params.permit(:firstname, :lastname, :email)
+    params.permit(:id, :firstname, :lastname, :email, :user_id)
   end
 
   def set_user
