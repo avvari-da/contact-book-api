@@ -13,7 +13,7 @@ class UsersController < ApplicationController
     user_data = user_params
     if User.where(email: user_data[:email]).count == 0
       user_data[:password] = Digest::MD5.hexdigest(user_data[:password]) unless user_data[:password].nil?
-      @user = User.create(user_data)
+      @user = User.create!(user_data)
       json_response(
         {
           id: @user.id,
@@ -68,7 +68,7 @@ class UsersController < ApplicationController
           email: @user.email,
           token: UserToken.create!(user: @user).access_token
         },
-        :created
+        :ok
       )
     end
   end

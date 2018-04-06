@@ -33,7 +33,7 @@ class ContactsController < ApplicationController
   def create
     contact_data = contact_params
     if @user.contacts.where(email: contact_data[:email]).count == 0
-      @contact = @user.contacts.create(contact_data)
+      @contact = @user.contacts.create!(contact_data)
       json_response(@contact, :created)
     else
       json_response({message: 'Contact already exists'}, :conflict)

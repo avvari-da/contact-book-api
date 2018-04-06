@@ -11,6 +11,10 @@ RSpec.describe 'Contacts API', type: :request do
   let(:user_id) do
     user.id
   end
+  let(:user_token) do
+    UserToken.where(user_id: user_id).update(active: false)
+    UserToken.create!(user: user).access_token
+  end
   let(:contact_id) do
     contacts.first.id
   end
@@ -19,13 +23,13 @@ RSpec.describe 'Contacts API', type: :request do
   describe 'GET /users/:user_id/contacts' do
     # make HTTP get request before each example
     before do
-      get "/users/#{user_id}/contacts"
+      get "/users/#{user_id}/contacts", params: nil, headers: { authorization: "Token #{user_token}" }
     end
 
     it 'returns contacts' do
       # Note `json` is a custom helper to parse JSON responses
       expect(json).not_to be_empty
-      expect(json.size).to eq(10)
+      expect(json['contacts'].count).to eq(10)
     end
 
     it 'returns status code 200' do
@@ -36,7 +40,7 @@ RSpec.describe 'Contacts API', type: :request do
   # Test suite for GET /users/:user_id/contacts/:id
   describe 'GET /users/:user_id/contacts/:id' do
     before do
-      get "/users/#{user_id}/contacts/#{contact_id}"
+      get "/users/#{user_id}/contacts/#{contact_id}", params: nil, headers: { authorization: "Token #{user_token}" }
     end
 
     context 'when the record exists' do
@@ -74,7 +78,7 @@ RSpec.describe 'Contacts API', type: :request do
 
     context 'when the request is valid' do
       before do
-        post "/users/#{user_id}/contacts", params: valid_attributes
+        post "/users/#{user_id}/contacts", params: valid_attributes, headers: { authorization: "Token #{user_token}" }
       end
 
       it 'creates a contact' do
@@ -89,7 +93,7 @@ RSpec.describe 'Contacts API', type: :request do
 
     context 'when the request is invalid' do
       before do
-        post "/users/#{user_id}/contacts", params: {firstname: 'Firstname', lastname: 'Lastname', user_id: user_id}
+        post "/users/#{user_id}/contacts", params: {firstname: 'Firstname', lastname: 'Lastname', user_id: user_id}, headers: { authorization: "Token #{user_token}" }
       end
 
       it 'returns status code 422' do
@@ -110,7 +114,9 @@ RSpec.describe 'Contacts API', type: :request do
     end
 
     context 'when the record exists' do
-      before { put "/users/#{user_id}/contacts/#{contact_id}", params: valid_attributes }
+      before do
+        put "/users/#{user_id}/contacts/#{contact_id}", params: valid_attributes, headers: { authorization: "Token #{user_token}" }
+      end
 
       it 'updates the record' do
         expect(response.body).to be_empty
@@ -125,7 +131,7 @@ RSpec.describe 'Contacts API', type: :request do
   # Test suite for DELETE /users/:user_id/contacts/:id
   describe 'DELETE /users/:user_id/contacts/:id' do
     before do
-      delete "/users/#{user_id}/contacts/#{contact_id}"
+      delete "/users/#{user_id}/contacts/#{contact_id}", headers: { authorization: "Token #{user_token}" }
     end
 
     it 'returns status code 204' do
