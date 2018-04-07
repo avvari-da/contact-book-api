@@ -10,35 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180401221916) do
+ActiveRecord::Schema.define(version: 20180407183751) do
 
-  create_table "contacts", force: :cascade do |t|
+  create_table "contacts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "firstname"
     t.string "lastname"
     t.string "email"
-    t.integer "user_id"
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id", "email"], name: "index_contacts_on_user_id_and_email", unique: true
     t.index ["user_id"], name: "index_contacts_on_user_id"
   end
 
-  create_table "user_tokens", force: :cascade do |t|
+  create_table "user_tokens", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "access_token"
     t.boolean "active", default: true
-    t.integer "user_id"
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_user_tokens_on_user_id"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
-    t.string "email"
+    t.string "email", limit: 50
     t.string "password"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "contacts", "users"
+  add_foreign_key "user_tokens", "users"
 end
