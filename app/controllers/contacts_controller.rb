@@ -15,10 +15,10 @@ class ContactsController < ApplicationController
     if contact_search_data[:q].present?
       query = '%' + contact_search_data[:q] + '%'
       total_count = @user.contacts.where('contacts.email LIKE ? OR contacts.firstname LIKE ? OR contacts.lastname LIKE ?', query, query, query).count
-      contacts = @user.contacts.where('contacts.email LIKE ? OR contacts.firstname LIKE ? OR contacts.lastname LIKE ?', query, query, query).limit(per_page).offset(offset)
+      contacts = @user.contacts.where('contacts.email LIKE ? OR contacts.firstname LIKE ? OR contacts.lastname LIKE ?', query, query, query).limit(per_page).offset(offset).order(firstname: :asc, lastname: :asc, id: :asc)
     else
       total_count = @user.contacts.count
-      contacts = @user.contacts.limit(per_page).offset(offset)
+      contacts = @user.contacts.limit(per_page).offset(offset).order(firstname: :asc, lastname: :asc, id: :asc)
     end
     total_pages = (total_count.to_f / per_page.to_f).ceil
     json_response({ contacts: contacts, total_pages: total_pages, page: page })
