@@ -27,7 +27,7 @@ test:
 
 production:
   <<: *default
-  host: "<%= ENV.fetch('MYSQL_HOST') { 'localhost' } %>"
-  username: "<%= ENV.fetch('MYSQL_USERNAME') { '' } %>"
-  password: "<%= ENV.fetch('MYSQL_PASSWORD') { '' } %>"
-  database: contact_book_production
+  host: "<%= ENV.fetch('CLEARDB_HOST') { 'localhost' } %>"
+  username: "<%= ENV.fetch('CLEARDB_USERNAME') { '' } %>"
+  password: "<%= ENV.fetch('CLEARDB_PASSWORD') { '' } %>"
+  database: "<%= ENV.fetch('CLEARDB_DATABASE') { '' } %>"
